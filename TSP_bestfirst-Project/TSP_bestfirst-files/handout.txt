@@ -1,0 +1,33 @@
+Implement TSP problem using best first algorithm (so it will be backtracking,
+branch-and-bound, and best-first). Since you are looking for a cycle,
+the start/finish city is not important.  Therefore we assume that start and 
+finish city is always index 0.
+
+For the bound use solution of the relaxed problem as discussed in class:
+TSP uses 2 constraints, 
+    1) all cities have to be visited, 
+    2) each city is visited once (except the start)
+Try dropping one of them and see if you can solve the resulting relaxed
+problem.
+
+Driver calls a function 
+std::vector<int> SolveTSP( char const* filename );
+return value is a vector of city indices in order they are visited. 
+The first and last values are always 0 (start=0, ...., finish=0). 
+Example:
+0 4 2 1 3 0
+
+Input file (map) format:
+file contains 1 + n(n-1)/2 integer values.
+First is the number of cities, then n(n-1)/2 distances in the following order:
+1->2 1->3 1->4 ......... 1->n
+     2->3 2->4 ......... 2->n
+               .........
+               (n-2)->n (n-2)->n
+                        (n-1)->n
+
+Spacing is not part of the formatting, so file is legal even if all 
+1 + n(n-1)/2 number are in one line.
+
+To submit 
+tsp.cpp
