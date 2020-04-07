@@ -95,8 +95,8 @@ int main(int argc, char ** argv) {
         pTests[test]();
     }
 
-    ////DEBUG
-    //SolveTSP("map0");
+    //DEBUG
+    SolveTSP("map0");
 
 
     return 0;
