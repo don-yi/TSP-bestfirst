@@ -94,5 +94,10 @@ int main(int argc, char ** argv) {
         sscanf_s(argv[1],"%i",&test);
         pTests[test]();
     }
+
+    ////DEBUG
+    //SolveTSP("map0");
+
+
     return 0;
 }
