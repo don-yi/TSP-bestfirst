@@ -27,4 +27,42 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\TSP_bestfirst-files\map0">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\TSP_bestfirst-files\map1">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\TSP_bestfirst-files\map2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\TSP_bestfirst-files\map3">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\TSP_bestfirst-files\map4">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\TSP_bestfirst-files\map5">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\TSP_bestfirst-files\map6">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\TSP_bestfirst-files\map7">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\TSP_bestfirst-files\map8">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\TSP_bestfirst-files\map9">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\TSP_bestfirst-files\map10">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\TSP_bestfirst-files\map11">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>

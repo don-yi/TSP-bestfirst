@@ -145,6 +145,20 @@
   <ItemGroup>
     <ClInclude Include="..\TSP_bestfirst-files\tsp.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\TSP_bestfirst-files\map0" />
+    <None Include="..\TSP_bestfirst-files\map1" />
+    <None Include="..\TSP_bestfirst-files\map10" />
+    <None Include="..\TSP_bestfirst-files\map11" />
+    <None Include="..\TSP_bestfirst-files\map2" />
+    <None Include="..\TSP_bestfirst-files\map3" />
+    <None Include="..\TSP_bestfirst-files\map4" />
+    <None Include="..\TSP_bestfirst-files\map5" />
+    <None Include="..\TSP_bestfirst-files\map6" />
+    <None Include="..\TSP_bestfirst-files\map7" />
+    <None Include="..\TSP_bestfirst-files\map8" />
+    <None Include="..\TSP_bestfirst-files\map9" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
