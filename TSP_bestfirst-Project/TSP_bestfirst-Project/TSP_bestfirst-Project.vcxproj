@@ -87,7 +87,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\DennisLee\source\repos\cs330_alg\TSP_bestfirst\TSP_bestfirst-files;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\DennisLee\source\repos\cs330_alg\TSP_bestfirst\TSP_bestfirst-Project\TSP_bestfirst-files;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -158,6 +158,21 @@
     <None Include="..\TSP_bestfirst-files\map7" />
     <None Include="..\TSP_bestfirst-files\map8" />
     <None Include="..\TSP_bestfirst-files\map9" />
+    <None Include="..\TSP_bestfirst-files\out0" />
+    <None Include="..\TSP_bestfirst-files\out1" />
+    <None Include="..\TSP_bestfirst-files\out10" />
+    <None Include="..\TSP_bestfirst-files\out11" />
+    <None Include="..\TSP_bestfirst-files\out2" />
+    <None Include="..\TSP_bestfirst-files\out3" />
+    <None Include="..\TSP_bestfirst-files\out4" />
+    <None Include="..\TSP_bestfirst-files\out5" />
+    <None Include="..\TSP_bestfirst-files\out6" />
+    <None Include="..\TSP_bestfirst-files\out7" />
+    <None Include="..\TSP_bestfirst-files\out8" />
+    <None Include="..\TSP_bestfirst-files\out9" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\TSP_bestfirst-files\handout.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

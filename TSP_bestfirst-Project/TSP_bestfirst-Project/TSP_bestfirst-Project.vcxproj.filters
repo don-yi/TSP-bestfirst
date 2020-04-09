@@ -28,9 +28,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\TSP_bestfirst-files\map0">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="..\TSP_bestfirst-files\map1">
       <Filter>Resource Files</Filter>
     </None>
@@ -64,5 +61,49 @@
     <None Include="..\TSP_bestfirst-files\map11">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="..\TSP_bestfirst-files\map0">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\TSP_bestfirst-files\out0">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\TSP_bestfirst-files\out1">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\TSP_bestfirst-files\out2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\TSP_bestfirst-files\out3">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\TSP_bestfirst-files\out4">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\TSP_bestfirst-files\out5">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\TSP_bestfirst-files\out6">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\TSP_bestfirst-files\out7">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\TSP_bestfirst-files\out8">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\TSP_bestfirst-files\out9">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\TSP_bestfirst-files\out10">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\TSP_bestfirst-files\out11">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\TSP_bestfirst-files\handout.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

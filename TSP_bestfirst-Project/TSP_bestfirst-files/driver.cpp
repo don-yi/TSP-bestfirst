@@ -95,9 +95,18 @@ int main(int argc, char ** argv) {
         pTests[test]();
     }
 
-    //DEBUG
-    SolveTSP("map0");
-
+    ////DEBUG
+    //SolveTSP("map0");
+    std::cout << std::endl << std::endl << std::endl;
+    test2();
+    //while (true)
+    //{
+    //  int test = 0;
+    //  scanf_s("%i", &test);
+    //  pTests[test]();
+    //  std::cout << std::endl;
+    //  std::cout << std::endl;
+    //}
 
     return 0;
 }

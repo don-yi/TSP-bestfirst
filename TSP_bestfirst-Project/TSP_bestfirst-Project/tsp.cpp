@@ -11,152 +11,186 @@
 
 
 void SolveTSPAux(
-  MAP const& mat,
-  int const& citySize,
-  int const& index,
+  MAP const& oriMat,
+  MAP const& mat_so_far,
+  std::vector<int> const& ndChecker,
   int const& cityFrom,
-  int const& cityTo,
-  std::vector<int>& solution_so_far,
-  int& cost_solution_so_far,
-  std::vector<int>& best_solution_so_far,
-  int& cost_best_solution_so_far,
-  int parent_id
+  std::vector<int>& best_solution_so_far
 )
 {
   //termination check (if on last level)
-  if (index == citySize)
+  if (ndChecker.size() == 1)
   {
-    if (cost_solution_so_far < cost_best_solution_so_far) {
-      cost_best_solution_so_far = cost_solution_so_far;
-      best_solution_so_far = solution_so_far;
-    }
-
+    best_solution_so_far.push_back(ndChecker[0]);
     return;
   }
 
-  // make sub mat
-  MAP subMat(citySize);
-  int reducedC = 0;
+  // init bsf var's
+  int bestCost = std::numeric_limits<int>::max();
+  MAP bestMat;
+  int bestNd = 0;
+
+  int const citySize = oriMat.size();
+  // find best sol for all not-done-nd
+  for (auto&& cityTo : ndChecker)
   {
-    // cp ori mat
-    for (int i = 0; i < citySize; ++i)
+    // make sub mat
+    MAP subMat(citySize);
+    int reducedC = 0;
     {
-      subMat[i] = mat[i];
-    }
-
-    // make from-city-row and to-city-col all infinity
-    for (auto&& elem : subMat[cityFrom])
-    {
-      elem = std::numeric_limits<int>::max();
-    }
-    for (auto&& row : subMat)
-    {
-      row[cityTo] = std::numeric_limits<int>::max();
-    }
-
-    // no return from city-to to city-from -> infinity
-    subMat[cityTo][cityFrom] = std::numeric_limits<int>::max();
-
-
-    ////DEBUG TMP MAT
-    //std::cout << std::endl << std::endl;
-    //for (auto const& row : subMat)
-    //{
-    //  for (const int elem : row)
-    //  {
-    //    // i for infinity
-    //    if (elem > 9999)
-    //    {
-    //      std::cout << "i" << " ";
-    //      continue;
-    //    }
-
-    //    std::cout << elem << " ";
-    //  }
-    //  std::cout << std::endl;
-    //}
-
-
-    // do row calc
-    for (auto&& vector : subMat)
-    {
-      // find row min
-      std::vector<int>::iterator forwardIt =
-        std::min_element(vector.begin(), vector.end());
-      int minPos = std::distance(vector.begin(), forwardIt);
-      int rowMin = vector[minPos];
-
-      // skip min 0
-      if (rowMin == 0 || rowMin > 9999)
+      // cp mat-so-far
+      for (int i = 0; i < citySize; ++i)
       {
-        continue;
+        subMat[i] = mat_so_far[i];
       }
 
-      // subt min from row
-      for (auto&& elem : vector)
+      // make from-city-row and to-city-col all infinity
+      for (auto&& elem : subMat[cityFrom])
       {
-        elem -= rowMin;
+        elem = std::numeric_limits<int>::max();
+      }
+      for (auto&& row : subMat)
+      {
+        row[cityTo] = std::numeric_limits<int>::max();
       }
 
-      // add all min val
-      reducedC += rowMin;
-    }
+      // no return from city-to to city-from -> infinity
+      subMat[cityTo][cityFrom] = std::numeric_limits<int>::max();
 
-    // do col calc
-    for (int i = 0; i < citySize; ++i)
-    {
-      // make vector for each col
-      std::vector<int> tmpVec{};
+
+      //todo: DEBUG INF MAT
+      std::cout << std::endl << std::endl;
+      std::cout << cityFrom << "->" << cityTo << std::endl;
+      std::cout << "inf mat" << std::endl;
+      for (auto const& row : subMat)
+      {
+        for (const int elem : row)
+        {
+          // i for infinity
+          if (elem > 9999)
+          {
+            std::cout << "i" << " ";
+            continue;
+          }
+
+          std::cout << elem << " ";
+        }
+        std::cout << std::endl;
+      }
+
+
+      // do row calc
       for (auto&& vector : subMat)
       {
-        tmpVec.push_back(vector[i]);
+        // find row min
+        std::vector<int>::iterator forwardIt =
+          std::min_element(vector.begin(), vector.end());
+        int minPos = std::distance(vector.begin(), forwardIt);
+        int rowMin = vector[minPos];
+
+        // skip min 0
+        if (rowMin == 0 || rowMin > 9999)
+        {
+          continue;
+        }
+
+        // subt min from row
+        for (auto&& elem : vector)
+        {
+          elem -= rowMin;
+        }
+
+        // add all min val
+        reducedC += rowMin;
       }
 
-      // find col min
-      std::vector<int>::iterator forwardIt =
-        std::min_element(tmpVec.begin(), tmpVec.end());
-      int minPos = std::distance(tmpVec.begin(), forwardIt);
-      int colMin = tmpVec[minPos];
-
-      // skip min 0
-      if (colMin == 0 || colMin > 9999)
+      // do col calc
+      for (int i = 0; i < citySize; ++i)
       {
-        continue;
+        // make vector for each col
+        std::vector<int> tmpVec{};
+        for (auto&& vector : subMat)
+        {
+          tmpVec.push_back(vector[i]);
+        }
+
+        // find col min
+        std::vector<int>::iterator forwardIt =
+          std::min_element(tmpVec.begin(), tmpVec.end());
+        int minPos = std::distance(tmpVec.begin(), forwardIt);
+        int colMin = tmpVec[minPos];
+
+        // skip min 0
+        if (colMin == 0 || colMin > 9999)
+        {
+          continue;
+        }
+
+        // subt min from col
+        for (auto&& vector : subMat)
+        {
+          vector[i] -= colMin;
+        }
+
+        // add all min val
+        reducedC += colMin;
       }
 
-      // subt min from col
-      for (auto&& vector : subMat)
+
+      //todo: DEBUG SUB MAT
+      std::cout << std::endl;
+      std::cout << "sub mat" << std::endl;
+      for (auto const& row : subMat)
       {
-        vector[i] -= colMin;
+        for (const int elem : row)
+        {
+          // i for infinity
+          if (elem > 9999)
+          {
+            std::cout << "i" << " ";
+            continue;
+          }
+
+          std::cout << elem << " ";
+        }
+        std::cout << std::endl;
       }
 
-      // add all min val
-      reducedC += colMin;
+
+    }
+
+    // up best var's
+    int const currCost = oriMat[cityFrom][cityTo] + reducedC;
+    if (currCost < bestCost)
+    {
+      bestCost = currCost;
+      bestMat = subMat;
+      bestNd = cityTo;
     }
   }
 
+  // up nd checker
+  std::vector<int> upedNdChecker = ndChecker;
+  upedNdChecker.erase(
+    std::remove(
+      upedNdChecker.begin(), 
+      upedNdChecker.end(), 
+      bestNd
+    ), 
+    upedNdChecker.end()
+  );
 
-  //DEBUG TMP MAT
-  std::cout << std::endl << std::endl;
-  for (auto const& row : subMat)
-  {
-    for (const int elem : row)
-    {
-      // i for infinity
-      if (elem > 9999)
-      {
-        std::cout << "i" << " ";
-        continue;
-      }
+  // up bsf
+  best_solution_so_far.push_back(bestNd);
 
-      std::cout << elem << " ";
-    }
-    std::cout << std::endl;
-  }
-  //MIN SUM
-  std::cout << reducedC << std::endl;
-
-
+  // recursive call
+  SolveTSPAux(
+    oriMat, 
+    bestMat, 
+    upedNdChecker, 
+    bestNd, 
+    best_solution_so_far
+  );
 }
 
 std::vector<int> SolveTSP(char const* filename)
@@ -218,7 +252,8 @@ std::vector<int> SolveTSP(char const* filename)
     }
   }
 
-  //DEBUG ORI MAT
+  //todo: DEBUG ORI MAT
+  std::cout << "ori mat" << std::endl;
   for (auto const& row : oriMat)
   {
     for (const int elem : row)
@@ -233,27 +268,27 @@ std::vector<int> SolveTSP(char const* filename)
       std::cout << elem << " ";
     }
     std::cout << std::endl;
+    std::cout << std::endl;
   }
 
-  // bsf and sf init
-  std::vector<int> best_solution_so_far;
-  std::vector<int> solution_so_far;
-  int cost_solution_so_far = 0;
-  int cost_best_solution_so_far = std::numeric_limits<int>::max();
+  // init param's
+  std::vector<int> ndChecker;
+  for (int i = 1; i < citySize; ++i)
+  {
+    ndChecker.push_back(i);
+  }
+  std::vector<int> best_solution_so_far(1, 0);
 
   // aux fn
   SolveTSPAux(
     oriMat,
-    citySize, 
-    0, 
+    oriMat,
+    ndChecker,
     0,
-    1,
-    solution_so_far, 
-    cost_solution_so_far, 
-    best_solution_so_far, 
-    cost_best_solution_so_far, 
-    0
+    best_solution_so_far
   );
+
+  best_solution_so_far.push_back(0);
 
   return best_solution_so_far;
 }
