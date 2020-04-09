@@ -10,62 +10,213 @@
 #include <iostream>
 
 
-std::vector<int> SolveTSP(char const* filename)
+void SolveTSPAux(
+  MAP const& mat,
+  int const& citySize,
+  int const& index,
+  int const& cityFrom,
+  int const& cityTo,
+  std::vector<int>& solution_so_far,
+  int& cost_solution_so_far,
+  std::vector<int>& best_solution_so_far,
+  int& cost_best_solution_so_far,
+  int parent_id
+)
 {
-  // var's
-  std::stringstream ss{};
-  std::vector<int> res(1, 0);
-
-  // open up file
-  std::ifstream ifs(filename);
-  if (!ifs.is_open())
+  //termination check (if on last level)
+  if (index == citySize)
   {
-    //abort();
-    return res;
+    if (cost_solution_so_far < cost_best_solution_so_far) {
+      cost_best_solution_so_far = cost_solution_so_far;
+      best_solution_so_far = solution_so_far;
+    }
+
+    return;
   }
 
-  // read in
-  ss << ifs.rdbuf();
+  // make sub mat
+  MAP subMat(citySize);
+  int reducedC = 0;
+  {
+    // cp ori mat
+    for (int i = 0; i < citySize; ++i)
+    {
+      subMat[i] = mat[i];
+    }
 
-  // close file
-  ifs.close();
+    // make from-city-row and to-city-col all infinity
+    for (auto&& elem : subMat[cityFrom])
+    {
+      elem = std::numeric_limits<int>::max();
+    }
+    for (auto&& row : subMat)
+    {
+      row[cityTo] = std::numeric_limits<int>::max();
+    }
+
+    // no return from city-to to city-from -> infinity
+    subMat[cityTo][cityFrom] = std::numeric_limits<int>::max();
+
+
+    ////DEBUG TMP MAT
+    //std::cout << std::endl << std::endl;
+    //for (auto const& row : subMat)
+    //{
+    //  for (const int elem : row)
+    //  {
+    //    // i for infinity
+    //    if (elem > 9999)
+    //    {
+    //      std::cout << "i" << " ";
+    //      continue;
+    //    }
+
+    //    std::cout << elem << " ";
+    //  }
+    //  std::cout << std::endl;
+    //}
+
+
+    // do row calc
+    for (auto&& vector : subMat)
+    {
+      // find row min
+      std::vector<int>::iterator forwardIt =
+        std::min_element(vector.begin(), vector.end());
+      int minPos = std::distance(vector.begin(), forwardIt);
+      int rowMin = vector[minPos];
+
+      // skip min 0
+      if (rowMin == 0 || rowMin > 9999)
+      {
+        continue;
+      }
+
+      // subt min from row
+      for (auto&& elem : vector)
+      {
+        elem -= rowMin;
+      }
+
+      // add all min val
+      reducedC += rowMin;
+    }
+
+    // do col calc
+    for (int i = 0; i < citySize; ++i)
+    {
+      // make vector for each col
+      std::vector<int> tmpVec{};
+      for (auto&& vector : subMat)
+      {
+        tmpVec.push_back(vector[i]);
+      }
+
+      // find col min
+      std::vector<int>::iterator forwardIt =
+        std::min_element(tmpVec.begin(), tmpVec.end());
+      int minPos = std::distance(tmpVec.begin(), forwardIt);
+      int colMin = tmpVec[minPos];
+
+      // skip min 0
+      if (colMin == 0 || colMin > 9999)
+      {
+        continue;
+      }
+
+      // subt min from col
+      for (auto&& vector : subMat)
+      {
+        vector[i] -= colMin;
+      }
+
+      // add all min val
+      reducedC += colMin;
+    }
+  }
+
+
+  //DEBUG TMP MAT
+  std::cout << std::endl << std::endl;
+  for (auto const& row : subMat)
+  {
+    for (const int elem : row)
+    {
+      // i for infinity
+      if (elem > 9999)
+      {
+        std::cout << "i" << " ";
+        continue;
+      }
+
+      std::cout << elem << " ";
+    }
+    std::cout << std::endl;
+  }
+  //MIN SUM
+  std::cout << reducedC << std::endl;
+
+
+}
+
+std::vector<int> SolveTSP(char const* filename)
+{
+  // file and str stream
+  std::stringstream ss{};
+  {
+    // open up file
+    std::ifstream ifs(filename);
+    if (!ifs.is_open())
+    {
+      //abort();
+      return {};
+    }
+
+    // read in
+    ss << ifs.rdbuf();
+
+    // close file
+    ifs.close();
+  }
 
   // get city size
   int citySize = 0;
   ss >> citySize;
 
-  // init mat w/ city size and infinity val
+  // make ori mat
   MAP oriMat(citySize);
-  for (int i = 0; i < citySize; ++i)
   {
-    oriMat[i].resize(
-      citySize, std::numeric_limits<int>::max()
-    );
-  }
-
-  // make diagonally symmetric mat
-  int i = 0;
-  while (i < citySize)
-  {
-    int j = i;
-    while (j < citySize)
+    // init mat w/ city size and infinity val
+    for (int i = 0; i < citySize; ++i)
     {
-      // skip diagonal elem
-      if (i == j)
-      {
-        ++j;
-        continue;
-      }
-
-      // assign elem
-      ss >> oriMat[i][j];
-      oriMat[j][i] = oriMat[i][j];
-
-      ++j;
+      oriMat[i].resize(
+        citySize, std::numeric_limits<int>::max()
+      );
     }
-    ++i;
-  }
 
+    // make diagonally symmetric mat
+    int i = 0;
+    while (i < citySize)
+    {
+      int j = i;
+      while (j < citySize)
+      {
+        // skip diagonal elem
+        if (i == j)
+        {
+          ++j;
+          continue;
+        }
+
+        // assign elem
+        ss >> oriMat[i][j];
+        oriMat[j][i] = oriMat[i][j];
+
+        ++j;
+      }
+      ++i;
+    }
+  }
 
   //DEBUG ORI MAT
   for (auto const& row : oriMat)
@@ -84,97 +235,26 @@ std::vector<int> SolveTSP(char const* filename)
     std::cout << std::endl;
   }
 
+  // bsf and sf init
+  std::vector<int> best_solution_so_far;
+  std::vector<int> solution_so_far;
+  int cost_solution_so_far = 0;
+  int cost_best_solution_so_far = std::numeric_limits<int>::max();
 
-  // cp ori mat
-  MAP tmpMat(citySize);
-  for (int i = 0; i < citySize; ++i)
-  {
-    tmpMat[i] = oriMat[i];
-  }
+  // aux fn
+  SolveTSPAux(
+    oriMat,
+    citySize, 
+    0, 
+    0,
+    1,
+    solution_so_far, 
+    cost_solution_so_far, 
+    best_solution_so_far, 
+    cost_best_solution_so_far, 
+    0
+  );
 
-  // do row calc's
-  int reducedC = 0;
-  for (auto&& vector : tmpMat)
-  {
-    // find row min
-    std::vector<int>::iterator forwardIt =
-      std::min_element(vector.begin(), vector.end());
-    int minPos = std::distance(vector.begin(), forwardIt);
-    int rowMin = vector[minPos];
-
-    // skip min 0
-    if (rowMin == 0)
-    {
-      continue;
-    }
-
-    // subt min from row
-    for (auto && elem : vector)
-    {
-      elem -= rowMin;
-    }
-
-    // add all min val
-    reducedC += rowMin;
-  }
-
-  // do col calc
-  for (int i = 0; i < citySize; ++i)
-  {
-    // make vector for each col
-    std::vector<int> tmpVec{};
-    for (auto&& vector : tmpMat)
-    {
-      tmpVec.push_back(vector[i]);
-    }
-
-    // find col min
-    std::vector<int>::iterator forwardIt =
-      std::min_element(tmpVec.begin(), tmpVec.end());
-    int minPos = std::distance(tmpVec.begin(), forwardIt);
-    int colMin = tmpVec[minPos];
-
-    // skip min 0
-    if (colMin == 0)
-    {
-      continue;
-    }
-
-    // subt min from col
-    for (auto&& vector : tmpMat)
-    {
-      vector[i] -= colMin;
-    }
-
-    // add all min val
-    reducedC += colMin;
-  }
-
-
-  //DEBUG TMP MAT
-  std::cout << std::endl << std::endl;
-  for (auto const& row : tmpMat)
-  {
-    for (const int elem : row)
-    {
-      // i for infinity
-      if (elem > 9999)
-      {
-        std::cout << "i" << " ";
-        continue;
-      }
-
-      std::cout << elem << " ";
-    }
-    std::cout << std::endl;
-  }
-  //MIN SUM
-  std::cout << reducedC << std::endl;
-
-  // return res
-  // todo: assign city num
-
-
-  return res;
+  return best_solution_so_far;
 }
 
