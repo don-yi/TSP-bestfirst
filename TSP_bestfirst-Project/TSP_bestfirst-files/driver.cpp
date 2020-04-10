@@ -95,10 +95,11 @@ int main(int argc, char ** argv) {
         pTests[test]();
     }
 
-    ////DEBUG
-    //SolveTSP("map0");
-    std::cout << std::endl << std::endl << std::endl;
-    test2();
+
+    //DEBUG
+
+    test9();
+
     //while (true)
     //{
     //  int test = 0;
@@ -107,6 +108,7 @@ int main(int argc, char ** argv) {
     //  std::cout << std::endl;
     //  std::cout << std::endl;
     //}
+
 
     return 0;
 }
