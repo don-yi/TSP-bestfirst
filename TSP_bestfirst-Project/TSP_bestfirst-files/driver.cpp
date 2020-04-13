@@ -98,16 +98,16 @@ int main(int argc, char ** argv) {
 
     //DEBUG
 
-    test9();
+    //test0();
 
-    //while (true)
-    //{
-    //  int test = 0;
-    //  scanf_s("%i", &test);
-    //  pTests[test]();
-    //  std::cout << std::endl;
-    //  std::cout << std::endl;
-    //}
+    while (true)
+    {
+      int test = 0;
+      scanf_s("%i", &test);
+      pTests[test]();
+      std::cout << std::endl;
+      std::cout << std::endl;
+    }
 
 
     return 0;
