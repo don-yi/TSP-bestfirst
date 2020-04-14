@@ -4,6 +4,7 @@
 #include "tsp.h"
 
 #include <algorithm> // std::min_elem()
+#include <map> // std::multimap
 
 
 //todo: FOR DEBUG
@@ -11,240 +12,151 @@
 bool isDebugOn = false;
 
 
-// tree info struct
-struct Nd
+//lower bound evaluation function
+int lower_bound(
+  MAP const& m,
+  int    const& index,
+  std::vector<int>& solution_so_far
+)
 {
-  int cost = 0;
-  MAP mat;
-  std::vector<int> cityUnvisited;
-  int cityFrom = 0;
-  std::vector<int> best_solution_so_far;
-};
-typedef std::vector<Nd> NDVEC;
+  int lower_bound = 0;
 
-std::vector<int> SolveTSPAux(NDVEC& ndVec)
-{
-  while (true)
+  // skip city visited
+  int const numCity = m.size();
+  for (int i = 0; i < numCity; ++i) 
   {
-    // find ind of best cost
-    int ndInd = 0;
-    int bestCost = std::numeric_limits<int>::max();
-    int cityUnvisitedSize = std::numeric_limits<int>::max();
-    for (int i = 0; i < ndVec.size(); ++i)
-    {
-      if (
-        (ndVec[i].cost == bestCost &&
-          ndVec[i].cityUnvisited.size() < cityUnvisitedSize)
-        ||
-        ndVec[i].cost < bestCost
+    if (
+      i > 0 &&
+      (
+        std::find(solution_so_far.begin(), solution_so_far.end(), i)
+        != solution_so_far.end()
         )
-      {
-        bestCost = ndVec[i].cost;
-        ndInd = i;
-        cityUnvisitedSize = ndVec[i].cityUnvisited.size();
-      }
-    }
-    // get curr nd
-    Nd currNd = ndVec[ndInd];
-
-    //termination check (if on last level)
-    if (currNd.cityUnvisited.size() == 1)
+      )
     {
-      currNd.best_solution_so_far.push_back(currNd.cityUnvisited[0]);
-      currNd.best_solution_so_far.push_back(0);
-      return currNd.best_solution_so_far;
+      continue;
     }
 
-    int const citySize = currNd.mat.size();
-    // for all not-done-nd in same lvl
-    for (auto&& cityTo : currNd.cityUnvisited)
+    int min_in_row = std::numeric_limits<int>::max();
+
+    for (int j = 0; j < numCity; ++j) 
     {
-      // make sub mat
-      MAP subMat(citySize);
-      int reducedCost = 0;
+      //check if job is not assigned (column is taken)
+      if (
+        j != solution_so_far[index] &&
+        std::find(solution_so_far.begin(), solution_so_far.end(), j) != solution_so_far.end()
+        ) 
       {
-        // cp mat-so-far
-        for (int i = 0; i < citySize; ++i)
-        {
-          subMat[i] = currNd.mat[i];
-        }
-
-        // skip for base city (0)
-        if (cityTo)
-        {
-          // make from-city-row and to-city-col all infinity
-          for (auto&& elem : subMat[currNd.cityFrom])
-          {
-            elem = std::numeric_limits<int>::max();
-          }
-          for (auto&& row : subMat)
-          {
-            row[cityTo] = std::numeric_limits<int>::max();
-          }
-
-          // no return from city-to to city-from -> infinity
-          subMat[cityTo][currNd.cityFrom] = std::numeric_limits<int>::max();
-
-
-          //todo: DEBUG INF MAT
-          if (isDebugOn)
-          {
-            std::cout << std::endl << std::endl;
-            std::cout << currNd.cityFrom << "->" << cityTo << std::endl;
-            std::cout << "inf mat" << std::endl;
-            for (auto const& row : subMat)
-            {
-              for (const int elem : row)
-              {
-                // i for infinity
-                if (elem > 9999)
-                {
-                  std::cout << "i" << " ";
-                  continue;
-                }
-
-                std::cout << elem << " ";
-              }
-              std::cout << std::endl;
-            }
-          }
-
-
-        }
-
-        // do row calc
-        for (auto&& vector : subMat)
-        {
-          // find row min
-          std::vector<int>::iterator forwardIt =
-            std::min_element(vector.begin(), vector.end());
-          int minPos = std::distance(vector.begin(), forwardIt);
-          int rowMin = vector[minPos];
-
-          // skip min 0
-          if (rowMin == 0 || rowMin > 9999)
-          {
-            continue;
-          }
-
-          // subt min from row
-          for (auto&& elem : vector)
-          {
-            elem -= rowMin;
-          }
-
-          // add all min val
-          reducedCost += rowMin;
-        }
-
-        // do col calc
-        for (int i = 0; i < citySize; ++i)
-        {
-          // make vector for each col
-          std::vector<int> tmpVec{};
-          for (auto&& vector : subMat)
-          {
-            tmpVec.push_back(vector[i]);
-          }
-
-          // find col min
-          std::vector<int>::iterator forwardIt =
-            std::min_element(tmpVec.begin(), tmpVec.end());
-          int minPos = std::distance(tmpVec.begin(), forwardIt);
-          int colMin = tmpVec[minPos];
-
-          // skip min 0
-          if (colMin == 0 || colMin > 9999)
-          {
-            continue;
-          }
-
-          // subt min from col
-          for (auto&& vector : subMat)
-          {
-            vector[i] -= colMin;
-          }
-
-          // add all min val
-          reducedCost += colMin;
-        }
+        continue;
       }
 
-
-      //todo: DEBUG SUB MAT
-      if (isDebugOn)
-      {
-        std::cout << std::endl;
-        std::cout << "sub mat" << std::endl;
-        for (auto const& row : subMat)
-        {
-          for (const int elem : row)
-          {
-            // i for infinity
-            if (elem > 9999)
-            {
-              std::cout << "i" << " ";
-              continue;
-            }
-
-            std::cout << elem << " ";
-          }
-          std::cout << std::endl;
-        }
-        std::cout << "reduced cost:" << reducedCost << std::endl;
-      }
-
-
-      // init new nd
-      Nd newNd;
-
-      // up's
-      newNd.best_solution_so_far = currNd.best_solution_so_far;
-      newNd.best_solution_so_far.push_back(cityTo);
-      newNd.cityFrom = cityTo;
-      newNd.mat = subMat;
-
-      // rm visited city by value
-      newNd.cityUnvisited = currNd.cityUnvisited;
-      newNd.cityUnvisited.erase(
-        std::remove(
-          newNd.cityUnvisited.begin(),
-          newNd.cityUnvisited.end(),
-          cityTo
-        ),
-        newNd.cityUnvisited.end()
-      );
-
-      // 1st city cost
-      if (!cityTo)
-      {
-        newNd.cost = reducedCost;
-      }
-      else
-      {
-        newNd.cost =
-          currNd.mat[currNd.cityFrom][cityTo] + currNd.cost + reducedCost;
-      }
-
-
-      if (isDebugOn)
-      {
-        std::cout << "total cost: " << newNd.cost;
-      }
-
-      // push new nd
-      ndVec.push_back(newNd);
-
-      // break if 1st city
-      if (!cityTo)
-      {
-        break;
-      }
+      if (min_in_row > m[i][j])
+        min_in_row = m[i][j];
     }
 
-    // rm curr nd
-    ndVec.erase(ndVec.begin() + ndInd);
+    lower_bound += min_in_row;
   }
+  return lower_bound;
+}
+
+void backtracking_branch_bound_best_first_aux(
+  MAP const& m,
+  unsigned const& index, 
+  std::vector<int>& solution_so_far, 
+  int& cost_solution_so_far, 
+  std::vector<int>& best_solution_so_far, 
+  int& cost_best_solution_so_far
+)
+{
+  unsigned const cityNum = m.size();
+  if (index == cityNum - 1)
+  {
+    solution_so_far.push_back(0);
+    cost_solution_so_far += m[solution_so_far[index]][0];
+    if (cost_solution_so_far < cost_best_solution_so_far)
+    {
+      cost_best_solution_so_far = cost_solution_so_far;
+      best_solution_so_far = solution_so_far;
+    }
+    cost_solution_so_far -= m[solution_so_far[index]][0];
+    solution_so_far.pop_back();
+
+    return;
+  }
+
+  std::multimap<int,int> ordered_jobs;
+
+  //generate nodes and order them by bound
+  for ( unsigned j=0; j<cityNum; ++j ) 
+  {
+      //skip if job j is already assigned
+      if (
+        std::find( 
+          solution_so_far.begin(), solution_so_far.end(), j) != solution_so_far.end()
+        )
+        continue;
+
+      solution_so_far.push_back( j );
+      cost_solution_so_far += m[solution_so_far[index]][j];
+
+      int const lb = lower_bound(m, index + 1, solution_so_far);
+      ordered_jobs.insert ( std::pair<int,int>(lb,j) );
+      cost_solution_so_far -= m[solution_so_far[index]][j];
+      solution_so_far.pop_back( );
+  }
+
+  std::multimap<int, int>::iterator
+  b = ordered_jobs.begin(), e = ordered_jobs.end();
+
+  while (b != e)
+  {
+    int j = b->second;
+    solution_so_far.push_back(j);
+    cost_solution_so_far += m[solution_so_far[index]][j];
+
+    int const lb = b->first;
+    if (lb + cost_solution_so_far < cost_best_solution_so_far) 
+    {
+      backtracking_branch_bound_best_first_aux(
+        m, 
+        index + 1,
+        solution_so_far, 
+        cost_solution_so_far,
+        best_solution_so_far, 
+        cost_best_solution_so_far
+        );
+    }
+
+    cost_solution_so_far -= m[solution_so_far[index]][j];
+    solution_so_far.pop_back();
+
+    ++b;
+  }
+}
+
+std::vector<int>
+backtracking_branch_bound_best_first(MAP const& m)
+{
+    std::vector<int> best_solution_so_far;
+    std::vector<int> solution_so_far;
+
+    // init
+    solution_so_far.push_back(0);
+    best_solution_so_far.push_back(0);
+    
+    int cost_solution_so_far = 0;
+    int cost_best_solution_so_far = std::numeric_limits<int>::max();
+
+    // aux call
+    backtracking_branch_bound_best_first_aux( 
+      m, 
+      0, 
+      solution_so_far, 
+      cost_solution_so_far, 
+      best_solution_so_far, 
+      cost_best_solution_so_far
+    );
+
+    return best_solution_so_far;
 }
 
 std::vector<int> SolveTSP(char const* filename)
@@ -330,20 +242,8 @@ std::vector<int> SolveTSP(char const* filename)
   }
 
 
-    // nd vec init
-  NDVEC ndVec;
-  // 1st nd
-  Nd firstNd;
-  firstNd.mat = oriMat;
-  for (int i = 0; i < citySize; ++i)
-  {
-    firstNd.cityUnvisited.push_back(i);
-  }
+  std::vector<int> res = backtracking_branch_bound_best_first(oriMat);
 
-  ndVec.push_back(firstNd);
-
-  // aux fn
-  std::vector<int> res = SolveTSPAux(ndVec);
   return res;
 }
 
